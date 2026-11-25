@@ -73,6 +73,12 @@
             <artifactId>spring-boot-starter-data-jdbc-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- RestTestClient: real HTTP calls against the app on a random port. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-resttestclient</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- Tests start their own throwaway Postgres in Docker. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
