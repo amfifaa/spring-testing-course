@@ -1,6 +1,7 @@
 package com.example.crashcourse.user;
 
 import com.example.crashcourse.TestcontainersConfiguration;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jdbc.test.autoconfigure.DataJdbcTest;
@@ -20,6 +21,13 @@ class UserRepositoryTest {
 
     @Autowired
     UserRepository userRepository;
+
+    // The Postgres container is shared with the integration tests (see TestcontainersConfiguration),
+    // and THEY don't roll back. So start from an empty table; this delete is rolled back too.
+    @BeforeEach
+    void startWithAnEmptyTable() {
+        userRepository.deleteAll();
+    }
 
     @Test
     void saveInsertsANewUserAndTheDatabaseAssignsTheId() {
@@ -58,7 +66,8 @@ class UserRepositoryTest {
 
     @Test
     void eachTestStartsWithAnEmptyTable() {
-        // Passes in any order, because the other tests' inserts were rolled back.
+        // Passes in any order: this class's inserts are rolled back, and @BeforeEach clears
+        // whatever the integration tests left in the shared database.
         assertThat(userRepository.count()).isZero();
     }
 }

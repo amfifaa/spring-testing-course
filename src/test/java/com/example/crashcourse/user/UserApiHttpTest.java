@@ -1,11 +1,8 @@
 package com.example.crashcourse.user;
 
-import com.example.crashcourse.TestcontainersConfiguration;
+import com.example.crashcourse.IntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
@@ -14,9 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 // The same app, but now over REAL HTTP: Tomcat starts on a random free port and
 // RestTestClient sends genuine HTTP requests to it, exactly like an external client would.
 // Use this when the network layer matters (filters, real serialization, headers, the server itself).
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureRestTestClient
-@Import(TestcontainersConfiguration.class)
+@IntegrationTest // starts Tomcat on a random port, see IntegrationTest
 class UserApiHttpTest {
 
     @Autowired

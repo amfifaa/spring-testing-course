@@ -10,9 +10,15 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @TestConfiguration(proxyBeanMethods = false)
 public class TestcontainersConfiguration {
 
+    // STATIC: one container for the whole test run, shared by every Spring context that imports this
+    // class (the integration tests AND the @DataJdbcTest slice). Without "static", each context
+    // would start its own Postgres container: that's several seconds per context.
+    // The price: tests share one database, so each test must clean up or use its own data.
+    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:17");
+
     @Bean
     @ServiceConnection
     PostgreSQLContainer postgresContainer() {
-        return new PostgreSQLContainer("postgres:17");
+        return POSTGRES;
     }
 }

@@ -1,13 +1,10 @@
 package com.example.crashcourse.user;
 
-import com.example.crashcourse.TestcontainersConfiguration;
+import com.example.crashcourse.IntegrationTest;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,9 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // Integration test: the WHOLE application (every bean, the real service, the real repository)
 // + a real Postgres in Docker (Testcontainers) + the Liquibase migrations.
 // MockMvc still skips the network: requests go straight into Spring MVC, but everything behind it is real.
-@SpringBootTest
-@AutoConfigureMockMvc
-@Import(TestcontainersConfiguration.class)
+@IntegrationTest
 class UserApiIntegrationTest {
 
     @Autowired
