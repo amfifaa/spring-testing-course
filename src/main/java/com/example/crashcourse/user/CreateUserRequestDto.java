@@ -9,5 +9,5 @@ import jakarta.validation.constraints.Size;
 public record CreateUserRequestDto(
         @NotBlank @Size(max = 50) String username,
         @NotBlank @Email String email,
-        String fullName) {
+        @Size(max = 255) String fullName) { // matches the varchar(255) column; found by UserApiIntegrationTest
 }

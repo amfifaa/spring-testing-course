@@ -2,6 +2,7 @@ package com.example.crashcourse.user;
 
 import com.example.crashcourse.TestcontainersConfiguration;
 import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +27,43 @@ class UserApiIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
+
+    @Autowired
+    UserRepository userRepository;
+
+    // The database is SHARED by every test that uses this context, and nothing is rolled back here.
+    // Without this, a test that counts users would see whatever earlier tests left behind,
+    // and pass or fail depending on the order the tests happen to run in.
+    @BeforeEach
+    void startWithAnEmptyTable() {
+        userRepository.deleteAll();
+    }
+
+    @Test
+    void listShowsExactlyTheUsersInTheDatabase() throws Exception {
+        userRepository.save(new User(null, "ada", "ada@example.com", null));
+        userRepository.save(new User(null, "linus", "linus@example.com", null));
+
+        mockMvc.perform(get("/api/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+    }
+
+    @Test
+    void aTooLongFullNameIsRejectedWith400() throws Exception {
+        // The column is varchar(255). Before @Size(max = 255) was added to CreateUserRequestDto,
+        // validation let this through and Postgres rejected the INSERT: the client got a 500.
+        // Only a test against the REAL database could find that: the limit isn't in any Java code.
+        String tooLong = "x".repeat(256);
+
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username": "long", "email": "long@example.com", "fullName": "%s"}
+                                """.formatted(tooLong)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.fullName").exists());
+    }
 
     @Test
     void aUserCanBeCreatedReadAndDeleted() throws Exception {
