@@ -1,0 +1,59 @@
+### Requests for the IntelliJ HTTP client (or copy them as curl commands).
+### Start the app first: ./mvnw spring-boot:run
+
+### List all users
+GET http://localhost:8080/api/users
+
+### Create a user
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "ada",
+  "email": "ada@example.com",
+  "fullName": "Ada Lovelace"
+}
+
+### Get one user
+GET http://localhost:8080/api/users/1
+
+### Delete a user
+DELETE http://localhost:8080/api/users/1
+
+### Content negotiation: ask for JSON -> 200 with a JSON body
+GET http://localhost:8080/api/users
+Accept: application/json
+
+### Content negotiation: ask for XML -> 406 Not Acceptable (no XML converter until you add jackson-dataformat-xml)
+GET http://localhost:8080/api/users
+Accept: application/xml
+
+### Invalid input -> 400 Bad Request
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "",
+  "email": "not-an-email"
+}
+
+### Same email twice -> 409 Conflict (run "Create a user" first)
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "ada2",
+  "email": "ada@example.com"
+}
+
+### Unknown id -> 404 Not Found
+GET http://localhost:8080/api/users/999
+
+### Is the app (and its database) healthy?
+GET http://localhost:8080/actuator/health
+
+### Every bean in the container
+GET http://localhost:8080/actuator/beans
+
+### How many HTTP requests have we served?
+GET http://localhost:8080/actuator/metrics/http.server.requests
