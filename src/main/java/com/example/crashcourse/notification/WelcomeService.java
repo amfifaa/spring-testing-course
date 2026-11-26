@@ -31,3 +31,4 @@ public class WelcomeService {
         notificationService.send(email, greeting + ". " + properties.welcomeMessage());
     }
 }
+
