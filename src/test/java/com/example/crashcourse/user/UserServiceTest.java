@@ -34,23 +34,18 @@ class UserServiceTest {
 
     @Test
     void createSavesTheUserAndSendsAWelcomeMail() {
-        // given: the email is free, and the database assigns id 1
         when(userRepository.findByEmail("ada@example.com")).thenReturn(Optional.empty());
         when(userRepository.save(any())).thenReturn(new User(1L, "ada", "ada@example.com", "Ada Lovelace"));
 
-        // when
         User created = userService.create(new CreateUserRequestDto("ada", "ada@example.com", "Ada Lovelace"));
 
-        // then: we got the saved user back...
         assertThat(created.id()).isEqualTo(1L);
 
-        // ...the service saved a NEW user (id null), with the fields from the request...
         ArgumentCaptor<User> saved = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(saved.capture());
         assertThat(saved.getValue().id()).isNull();
         assertThat(saved.getValue().username()).isEqualTo("ada");
 
-        // ...and welcomed the new user
         verify(welcomeService).welcome("ada@example.com");
     }
 
