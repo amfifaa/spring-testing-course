@@ -83,7 +83,6 @@ Pyramid or honeycomb, both agree: fast tests for logic, real tests for wiring. T
 - **Test behaviour, not implementation.** Assert what the code *does* (the API returns 404, the row is in the table), not *how* (which private method was called). Over-mocked tests break on every refactoring and catch nothing.
 - **One reason to fail.** When it goes red, the name tells you what broke.
 - **Names that read as sentences:** `createRejectsADuplicateEmailAndSavesNothing`, not `testCreate2`.
-- **Given / when / then:** set up, act once, check.
 - **Mock at your boundaries, not everything.** Mock what's slow or outside your control (a mail server). Don't mock the database to test your SQL: use a real one.
 - **F.I.R.S.T.:** Fast, Isolated (no shared state), Repeatable (same result every run, any order), Self-validating (passes or fails, no reading logs), Timely (written with the code).
 - **A test you've never seen fail proves nothing.** We'll break the code on purpose more than once today.
@@ -102,7 +101,7 @@ Files: `user/UserServiceTest.java`, `notification/WelcomeServiceTest.java`.
 Demo:
 1. **`UserServiceTest`**: no Spring at all.
    - `@ExtendWith(MockitoExtension.class)` + `@Mock` + `@InjectMocks`: Mockito creates the mocks and calls the constructor. That works only because `UserService` uses **constructor injection**.
-   - Read `createSavesTheUserAndSendsAWelcomeMail` top to bottom: *given* (`when(...).thenReturn(...)`), *when* (one call), *then* (AssertJ `assertThat`, `verify`).
+   - Read `createSavesTheUserAndSendsAWelcomeMail` top to bottom: set up the mocks (`when(...).thenReturn(...)`), make one call, check the result (AssertJ `assertThat`, `verify`).
    - **`ArgumentCaptor`**: catch the `User` that was passed to `save()` and check it (id is `null`, so it's a new row).
    - `verify(..., never())`: on a duplicate email nothing is saved and no mail goes out.
 2. **`WelcomeServiceTest`**: the greeting depends on the time of day.
