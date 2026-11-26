@@ -59,8 +59,25 @@ If you run late, cut `test-06` down to the before/after numbers and the "what cr
 | Integration tests | Some | ~1 s to seconds | Medium to high: real Spring, a real database | Narrow (slices): `test-02`, `test-03`. Broad (whole app): `test-04`, `test-05` |
 | End-to-end tests | Fewest | Minutes | Highest: the deployed system, used the way a real client uses it | Not covered; `UserApiHttpTest` (real HTTP) is the closest |
 
-- The "testing trophy" argues for more integration tests, because that's where real bugs hide (we'll find one in `test-05`). Both agree: fast tests for logic, real tests for wiring.
 - Spring's **slices** are narrow integration tests: real Spring, but only one layer. `@SpringBootTest` is the broad kind: every layer at once.
+
+**The honeycomb: Spotify's counter-argument** (*Testing of Microservices*, Spotify engineering blog, 2018). The pyramid becomes a diamond: thin at both ends, fat in the middle.
+
+| Kind | How many | What it is | In this course |
+|---|---|---|---|
+| Integrated tests | Fewest, ideally none | Pass or fail depending on *another* system being correct. Slow and flaky | Not covered |
+| Integration tests | Most | The one service with its real dependencies (database), tested through its API | `test-04`, `test-05`: `@SpringBootTest` + Testcontainers |
+| Implementation-detail tests | Few | Only for code with real internal logic of its own | `WelcomeServiceTest` (`test-01`): tricky boundaries, no wiring |
+
+Their argument:
+- In a microservice, most of the complexity isn't *inside* the service, it's in how it talks to the outside: the database, the HTTP API, other services. That's what a test should exercise.
+- Unit tests of the internals lock in *how* the code is built. Refactor, and they break although nothing is wrong. Tests through the API survive a refactoring.
+- Real dependencies are cheap now: with Docker and Testcontainers, a test against a real Postgres takes seconds.
+- Don't confuse *integration* with *integrated*: test your service against real infrastructure, not against other teams' live services.
+
+The "testing trophy" (Kent C. Dodds) makes the same point for front-ends: most tests should be integration tests. We'll see why in `test-05`, where a real bug only shows up against the real database.
+
+Pyramid or honeycomb, both agree: fast tests for logic, real tests for wiring. They disagree about how much of a typical service is logic and how much is wiring.
 
 **What makes a good test:**
 - **Test behaviour, not implementation.** Assert what the code *does* (the API returns 404, the row is in the table), not *how* (which private method was called). Over-mocked tests break on every refactoring and catch nothing.
