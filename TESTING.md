@@ -120,6 +120,21 @@ git checkout -f test-02
 git diff test-01 test-02 --stat
 ```
 
+**First, the toolbox.** Spring Boot ships a slice for most technologies. We use two of them (★), but they all work the same way: start only the beans for one layer, plus test helpers for it.
+
+| Area | Annotations |
+|---|---|
+| Web | `@WebMvcTest` ★, `@WebFluxTest`, `@GraphQlTest` |
+| SQL data | `@DataJdbcTest` ★, `@DataJpaTest`, `@JdbcTest`, `@JooqTest`, `@DataR2dbcTest` |
+| NoSQL data | `@DataMongoTest`, `@DataRedisTest`, `@DataCassandraTest`, `@DataElasticsearchTest`, `@DataNeo4jTest` |
+| Clients & JSON | `@RestClientTest` (your outgoing HTTP clients), `@JsonTest` (Jackson mapping only) |
+| The whole app | `@SpringBootTest` ★, plus `@AutoConfigureMockMvc` ★, `@AutoConfigureRestTestClient` ★, `@AutoConfigureWebTestClient` |
+| Swapping beans | `@MockitoBean` ★, `@MockitoSpyBean`, `@Import` ★ for test configuration |
+| Real infrastructure | `@ServiceConnection` ★ + Testcontainers |
+
+- Older tutorials (and slides) use **`@MockBean`** / `@SpyBean`. They were deprecated in Spring Boot 3.4 and are gone in Spring Boot 4: use `@MockitoBean` / `@MockitoSpyBean`.
+- In Spring Boot 4 each slice lives in its technology's own test starter, e.g. `spring-boot-starter-data-jpa-test` for `@DataJpaTest`.
+
 Demo:
 1. **`@WebMvcTest(UserController.class)`** starts only the web layer: this controller, Jackson, Bean Validation and `@RestControllerAdvice`. No service, no database. It tests the **HTTP contract**: URLs, status codes, JSON, error format.
 2. **`@MockitoBean UserService`**: a Mockito mock that lives *in the Spring context*, in place of the real service.
